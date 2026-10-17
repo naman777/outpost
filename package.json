@@ -1,0 +1,51 @@
+{
+  "name": "mailpulse",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "setup:check": "node scripts/check-env.mjs",
+    "test": "tsx --test src/lib/*.test.ts scripts/*.test.ts",
+    "test:smoke": "node scripts/smoke.mjs",
+    "tracking:rebuild": "tsx scripts/rebuild-tracking.ts",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:studio": "drizzle-kit studio",
+    "typecheck": "next typegen && tsc --noEmit",
+    "add:mailbox": "tsx scripts/add-smtp-account.ts",
+    "import:tracker": "tsx scripts/import-outreach.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.4",
+    "imapflow": "^2.5.2",
+    "next": "16.4.2",
+    "nodemailer": "^10.4.0",
+    "postgres": "^3.4.9",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "recharts": "^3.10.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.15",
+    "@electric-sql/pglite-socket": "^0.2.18",
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dotenv": "^18.0.8",
+    "drizzle-kit": "^0.31.11",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.2",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5"
+  }
+}
