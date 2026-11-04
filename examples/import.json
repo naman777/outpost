@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "applications": [
+    {
+      "id": "example-company",
+      "company": "Example Company",
+      "role": "Software Engineer",
+      "contactName": "Alex Example",
+      "contactEmail": "alex@example.com",
+      "status": "emailed",
+      "notes": "Fictional example. Replace with your own export."
+    }
+  ],
+  "messages": [
+    {
+      "id": "example-first-message",
+      "applicationId": "example-company",
+      "toEmail": "alex@example.com",
+      "subject": "Software engineering opportunity",
+      "bodyText": "Hi Alex, I would like to learn more about the role.",
+      "sentAt": "2026-01-15T10:00:00Z",
+      "status": "sent"
+    }
+  ]
+}
