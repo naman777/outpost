@@ -1,4 +1,5 @@
 import { Icon } from "@/components/icon";
+import { Logo } from "@/components/logo";
 
 export default async function Login({ searchParams }: PageProps<"/login">) {
   const sp = await searchParams;
@@ -6,7 +7,7 @@ export default async function Login({ searchParams }: PageProps<"/login">) {
   return (
     <div className="login-page">
       <section className="login-story">
-        <a href="https://github.com/naman777/outpost" className="brand"><span className="brand-mark"><Icon name="mail" /></span><span>Outpost<span className="brand-subtitle">Your outreach workspace</span></span></a>
+        <a href="https://github.com/naman777/outpost" className="brand"><Logo /></a>
         <div className="login-intro"><p className="login-eyebrow">Personal outreach, on your terms.</p><h2>A clearer view of your outreach.</h2><p>Send personalized emails, follow the signals, and keep your applications organized in your own workspace.</p><div className="login-features"><span><Icon name="mail" />Email tracking</span><span><Icon name="bulk" />Bulk sending</span><span><Icon name="applications" />Applications</span></div></div>
         <p className="login-story-footer">Open source. Self-hosted. Yours to make your own.</p>
       </section>

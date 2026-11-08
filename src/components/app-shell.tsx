@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Nav, NAV_ITEMS } from "./nav";
 import { Icon } from "./icon";
 import { ThemeToggle } from "./theme-toggle";
+import { Logo } from "./logo";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -15,7 +16,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <a href="#main-content" className="skip-link">Skip to content</a>
     <aside className={`app-sidebar ${open ? "nav-open" : ""}`}>
       <div className="sidebar-brand-row">
-        <Link href="/" className="brand" aria-label="Outpost overview"><span className="brand-mark"><Icon name="mail" /></span><span>Outpost<span className="brand-subtitle">Your outreach workspace</span></span></Link>
+        <Link href="/" className="brand" aria-label="Outpost overview"><Logo /></Link>
         <button className="mobile-menu icon-button" aria-expanded={open} aria-controls="sidebar-navigation" aria-label={open ? "Close navigation" : "Open navigation"} onClick={() => setOpen(!open)}><Icon name={open ? "close" : "menu"} /></button>
       </div>
       <div id="sidebar-navigation" className="sidebar-navigation"><Nav onNavigate={() => setOpen(false)} /></div>

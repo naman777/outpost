@@ -175,6 +175,13 @@
 .brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: var(--page-bg); }
 .brand-mark .icon { width: 21px; height: 21px; }
 .brand-subtitle { display: block; margin-top: 2px; font-size: 10px; font-weight: 400; letter-spacing: 0; color: var(--color-zinc-500); }
+.brand-lockup { display: flex; flex-direction: column; align-items: flex-start; }
+.brand-logo { width: 172px; height: auto; object-fit: contain; }
+.brand-lockup .brand-subtitle { margin: -2px 0 0 54px; font-size: 9px; }
+.login-story .brand-logo { width: 220px; }
+.login-story .brand-lockup .brand-subtitle { margin-left: 69px; font-size: 10px; }
+:root[data-theme="dark"] .brand-logo { filter: brightness(0) invert(.94); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .brand-logo { filter: brightness(0) invert(.94); } }
 .sidebar-brand-row { padding-inline: 8px; }
 .sidebar-navigation { margin-top: 38px; flex-shrink: 0; }
 .nav-group + .nav-group { margin-top: 30px; }

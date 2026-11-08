@@ -75,6 +75,9 @@ try {
   const iconResponse = await request("/icon.svg");
   assert.equal(iconResponse.status, 200, "The branded icon must load before sign-in");
   await iconResponse.arrayBuffer();
+  const logoResponse = await request("/logo.png");
+  assert.equal(logoResponse.status, 200, "The supplied logo must load before sign-in");
+  await logoResponse.arrayBuffer();
   if (process.argv.includes("--browser")) {
     const { checkBrowserAuth } = await import("./browser-auth.mjs");
     await checkBrowserAuth({ origin, password: env.DASHBOARD_PASSWORD });
