@@ -19,8 +19,8 @@ export function DailyChart({ data }: { data: Row[] }) {
               contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid var(--color-zinc-200)", background: "var(--color-white)", color: "var(--page-fg)" }}
             />
             <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} formatter={(value) => <span className="text-zinc-600">{value}</span>} />
-            <Bar dataKey="sent" name="Sent" fill="#7b9586" radius={[3, 3, 0, 0]} />
-            <Bar dataKey="opened" name="Estimated opens" fill="#459384" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="sent" name="Sent" fill="#8a96b0" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="opened" name="Estimated opens" fill="#6f8ec4" radius={[3, 3, 0, 0]} />
             <Bar dataKey="replied" name="Replied" fill="var(--accent)" radius={[3, 3, 0, 0]} />
             <Bar dataKey="bounced" name="Bounced" fill="#c38378" radius={[3, 3, 0, 0]} />
           </BarChart>

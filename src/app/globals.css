@@ -8,47 +8,47 @@
 @layer base {
   :root {
     color-scheme: light;
-    --page-bg: #f5f7f6;
-    --page-fg: #26342f;
-    --sidebar-bg: #fafcfb;
-    --accent: #187566;
-    --accent-hover: #115d51;
-    --accent-soft: #e8f2ee;
-    --accent-border: #cde3d9;
+    --page-bg: #f6f7f9;
+    --page-fg: #2a303c;
+    --sidebar-bg: #fbfcfe;
+    --accent: #435eb1;
+    --accent-hover: #344c96;
+    --accent-soft: #edf1fb;
+    --accent-border: #d5def4;
     --color-white: #ffffff;
-    --color-zinc-50: #f7f9f8;
-    --color-zinc-100: #eff3f1;
-    --color-zinc-200: #e2e9e5;
-    --color-zinc-300: #ccd7d1;
-    --color-zinc-400: #8c9d94;
-    --color-zinc-500: #607568;
-    --color-zinc-600: #52675b;
-    --color-zinc-700: #3f5548;
-    --color-zinc-800: #2c4135;
-    --color-zinc-900: #203329;
-    --color-zinc-950: #14241b;
+    --color-zinc-50: #f8f9fb;
+    --color-zinc-100: #eff2f6;
+    --color-zinc-200: #e3e7ee;
+    --color-zinc-300: #cdd4df;
+    --color-zinc-400: #8a95a8;
+    --color-zinc-500: #66738a;
+    --color-zinc-600: #526078;
+    --color-zinc-700: #404d64;
+    --color-zinc-800: #2e3a50;
+    --color-zinc-900: #202b3e;
+    --color-zinc-950: #151e2d;
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --page-bg: #111a17;
-    --page-fg: #e3eee7;
-    --sidebar-bg: #15201b;
-    --accent: #78c5aa;
-    --accent-hover: #9bd7c2;
-    --accent-soft: #203c30;
-    --accent-border: #375848;
-    --color-white: #19261f;
-    --color-zinc-50: #1c2a22;
-    --color-zinc-100: #213128;
-    --color-zinc-200: #2c3e32;
-    --color-zinc-300: #3f5447;
-    --color-zinc-400: #849b8c;
-    --color-zinc-500: #a1b6a7;
-    --color-zinc-600: #b2c6b8;
-    --color-zinc-700: #c9dacd;
-    --color-zinc-800: #d7e6da;
-    --color-zinc-900: #e6f0e8;
-    --color-zinc-950: #f4f9f5;
+    --page-bg: #111318;
+    --page-fg: #e6eaf2;
+    --sidebar-bg: #16191f;
+    --accent: #a1b7ee;
+    --accent-hover: #bbccf6;
+    --accent-soft: #26324c;
+    --accent-border: #3d5074;
+    --color-white: #1b1f27;
+    --color-zinc-50: #1f242e;
+    --color-zinc-100: #252b37;
+    --color-zinc-200: #30394a;
+    --color-zinc-300: #455167;
+    --color-zinc-400: #8997af;
+    --color-zinc-500: #a5b1c7;
+    --color-zinc-600: #b7c1d4;
+    --color-zinc-700: #cbd3e2;
+    --color-zinc-800: #dce2ed;
+    --color-zinc-900: #e9edf5;
+    --color-zinc-950: #f5f7fc;
     --color-emerald-50: #203c30;
     --color-emerald-200: #375848;
     --color-emerald-700: #8cceb1;
@@ -70,25 +70,25 @@
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-    --page-bg: #111a17;
-    --page-fg: #e3eee7;
-    --sidebar-bg: #15201b;
-    --accent: #78c5aa;
-    --accent-hover: #9bd7c2;
-    --accent-soft: #203c30;
-    --accent-border: #375848;
-    --color-white: #19261f;
-    --color-zinc-50: #1c2a22;
-    --color-zinc-100: #213128;
-    --color-zinc-200: #2c3e32;
-    --color-zinc-300: #3f5447;
-    --color-zinc-400: #849b8c;
-    --color-zinc-500: #a1b6a7;
-    --color-zinc-600: #b2c6b8;
-    --color-zinc-700: #c9dacd;
-    --color-zinc-800: #d7e6da;
-    --color-zinc-900: #e6f0e8;
-    --color-zinc-950: #f4f9f5;
+    --page-bg: #111318;
+    --page-fg: #e6eaf2;
+    --sidebar-bg: #16191f;
+    --accent: #a1b7ee;
+    --accent-hover: #bbccf6;
+    --accent-soft: #26324c;
+    --accent-border: #3d5074;
+    --color-white: #1b1f27;
+    --color-zinc-50: #1f242e;
+    --color-zinc-100: #252b37;
+    --color-zinc-200: #30394a;
+    --color-zinc-300: #455167;
+    --color-zinc-400: #8997af;
+    --color-zinc-500: #a5b1c7;
+    --color-zinc-600: #b7c1d4;
+    --color-zinc-700: #cbd3e2;
+    --color-zinc-800: #dce2ed;
+    --color-zinc-900: #e9edf5;
+    --color-zinc-950: #f5f7fc;
     --color-emerald-50: #203c30;
     --color-emerald-200: #375848;
     --color-emerald-700: #8cceb1;
@@ -164,7 +164,7 @@
   .evidence-value { @apply text-lg font-semibold tabular-nums; }
   .range-tabs { @apply grid w-full grid-cols-4 rounded-lg border border-zinc-200 bg-zinc-100 p-1 sm:w-auto; }
   .range-tab { @apply grid min-h-9 place-items-center rounded-md px-3 text-center text-xs font-medium text-zinc-500; }
-  .range-tab[aria-current] { background: var(--color-white); color: var(--color-zinc-900); box-shadow: 0 1px 3px #163e2710; }
+  .range-tab[aria-current] { background: var(--color-white); color: var(--color-zinc-900); box-shadow: 0 1px 3px #243a6710; }
   .range-tab:hover { color: var(--color-zinc-900); }
 }
 
