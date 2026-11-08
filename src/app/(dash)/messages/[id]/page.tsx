@@ -1,7 +1,7 @@
 import { asc, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { deleteMessage, markBounced, markReplied, toggleOpen } from "@/app/actions";
+import { deleteMessage, markBounced, markReplied, toggleClick, toggleOpen } from "@/app/actions";
 import { accounts, applications, clicks, db, links, messages, opens, replies } from "@/db";
 import { Badge, EngagementBadge, MessageState, PageHeader, STATUS_TONE, Stat, TextLink } from "@/components/ui";
 import { dateTime, duration, SOURCE_LABEL } from "@/lib/format";
@@ -29,7 +29,7 @@ export default async function MessagePage({ params }: PageProps<"/messages/[id]"
   const engagement = computeEngagement(m);
   const linkUrl = new Map(linkRows.map((l) => [l.id, l.url]));
 
-  type Ev = { at: Date; kind: string; title: string; detail?: string | null; human: boolean; eligible?: boolean; confidence?: string; openId?: number };
+  type Ev = { at: Date; kind: string; title: string; detail?: string | null; human: boolean; eligible?: boolean; confidence?: string; openId?: number; clickId?: number; exclusion?: string };
   const events: Ev[] = [
     ...(m.sentAt ? [{ at: m.sentAt, kind: "sent", title: `Sent via ${m.channel}`, detail: m.fromEmail, human: true }] : []),
     ...openRows.map((o) => ({
@@ -42,7 +42,12 @@ export default async function MessagePage({ params }: PageProps<"/messages/[id]"
       confidence: o.confidence,
       openId: o.id,
     })),
-    ...clickRows.map((c) => ({ at: c.at, kind: "click", title: c.isHuman ? "Likely link click" : "Link request", detail: [linkUrl.get(c.linkId), c.reason].filter(Boolean).join(" · "), human: c.counted, confidence: c.confidence })),
+    ...clickRows.map((c) => ({
+      at: c.at, kind: "click", title: c.isHuman ? "Likely link click" : "Link request",
+      detail: [linkUrl.get(c.linkId), c.reason].filter(Boolean).join(" · "),
+      human: c.counted, eligible: c.isHuman, confidence: c.confidence, clickId: c.id,
+      exclusion: c.isHuman ? "deduplicated" : c.reason?.includes("operator IP") ? "excluded: dashboard IP match" : "excluded",
+    })),
     ...replyRows.map((r) => ({ at: r.at, kind: r.kind, title: r.kind === "bounce" ? "Bounced" : `Reply from ${r.fromEmail ?? "recipient"}`, detail: r.snippet, human: true })),
   ].sort((a, b) => a.at.getTime() - b.at.getTime());
 
@@ -84,6 +89,9 @@ export default async function MessagePage({ params }: PageProps<"/messages/[id]"
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <section className="card p-4 lg:col-span-2">
           <h2 className="mb-3 text-sm font-semibold">Timeline</h2>
+          {clickRows.some((c) => !c.isHuman && c.reason?.includes("operator IP")) && (
+            <p className="mb-3 text-xs text-zinc-500">An IP match can exclude real clicks from someone on your Wi-Fi or office network. Use “Include this click” only when you recognize the activity. Repeated clicks within the deduplication window still count once.</p>
+          )}
           {!m.tracked && <p className="mb-3 text-xs text-zinc-500">No open-tracking pixel. Replies and bounces are still tracked.</p>}
           <ol className="relative space-y-3 border-l border-zinc-200 pl-4">
             {events.map((e, i) => (
@@ -91,7 +99,7 @@ export default async function MessagePage({ params }: PageProps<"/messages/[id]"
                 <span className={`absolute -left-[5px] mt-1.5 h-2.5 w-2.5 rounded-full ${dot(e.kind, e.human)}`} />
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   <span className="font-medium">{e.title}</span>
-                  {!e.human && <Badge>not counted / deduplicated</Badge>}
+                  {!e.human && <Badge>{e.exclusion ?? "not counted / deduplicated"}</Badge>}
                   {e.confidence && <Badge>{e.confidence} confidence</Badge>}
                   <span className="text-xs text-zinc-500">{dateTime(e.at)}</span>
                   {e.openId && (
@@ -101,6 +109,16 @@ export default async function MessagePage({ params }: PageProps<"/messages/[id]"
                       <input type="hidden" name="human" value={String(!e.eligible)} />
                       <button className="text-xs text-zinc-500 underline hover:text-zinc-900">
                         {e.eligible ? "exclude this estimate" : "include as estimate"}
+                      </button>
+                    </form>
+                  )}
+                  {e.clickId && m.trackClicks && (
+                    <form action={toggleClick}>
+                      <input type="hidden" name="clickId" value={e.clickId} />
+                      <input type="hidden" name="messageId" value={m.id} />
+                      <input type="hidden" name="human" value={String(!e.eligible)} />
+                      <button className="text-xs text-zinc-500 underline hover:text-zinc-900">
+                        {e.eligible ? "Exclude this click" : "Include this click"}
                       </button>
                     </form>
                   )}

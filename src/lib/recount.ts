@@ -1,5 +1,5 @@
 import { and, eq, sql } from "drizzle-orm";
-import { db, messages, opens } from "@/db";
+import { clicks, db, messages, opens } from "@/db";
 import { getSettings } from "./settings";
 
 type Executor = Pick<typeof db, "execute">;
@@ -88,6 +88,19 @@ export async function setOpenInclusion(messageId: string, openId: number, includ
       ? { isHuman: true, confidence: "high", reason: "manually included by operator; not proof of reading" }
       : { isHuman: false, confidence: "none", reason: "manually excluded by operator" })
       .where(and(eq(opens.id, openId), eq(opens.messageId, messageId)));
+    await refreshTrackingInTransaction(tx, messageId, settings.dedupeSeconds);
+  });
+}
+
+export async function setClickInclusion(messageId: string, clickId: number, included: boolean) {
+  const settings = await getSettings();
+  await db.transaction(async (tx) => {
+    const [message] = await tx.select({ id: messages.id }).from(messages).where(eq(messages.id, messageId)).for("update");
+    if (!message) return;
+    await tx.update(clicks).set(included
+      ? { isHuman: true, confidence: "medium", reason: "manually included by operator; recipient identity is not verified" }
+      : { isHuman: false, confidence: "none", reason: "manually excluded by operator" })
+      .where(and(eq(clicks.id, clickId), eq(clicks.messageId, messageId)));
     await refreshTrackingInTransaction(tx, messageId, settings.dedupeSeconds);
   });
 }

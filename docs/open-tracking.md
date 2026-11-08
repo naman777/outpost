@@ -100,6 +100,17 @@ The default rebuild is read-only. `--apply` reclassifies stored pixels using ava
 
 ## Verification
 
+### Correcting clicks
+
+On a message's timeline, use **Include this click** for a request you recognize that was excluded,
+or **Exclude this click** for an included request you know was yours or automated.
+An **excluded: dashboard IP match** label means the request shared an IP with dashboard activity;
+people on the same Wi-Fi or office network can share an IP. This is a heuristic, not identity proof.
+Corrections update message/link counts and engagement, preserve the event's source and raw history,
+and still respect deduplication and disabled click tracking. They do not create image opens or replies.
+
+### Automated checks
+
 ```sh
 npm test
 npm run typecheck

@@ -169,6 +169,18 @@ try {
     assert.ok([200, 303].includes(response.status), `${name}: ${response.status}`);
     await response.arrayBuffer();
   };
+  const clickEvent = (await pg.query("select id from clicks where message_id = $1 and counted limit 1", [apple.id])).rows[0];
+  assert.ok(clickEvent);
+  await invokeAction("toggleClick", { messageId: apple.id, clickId: clickEvent.id, human: false });
+  let clickSummary = (await pg.query("select click_count, open_count, engagement_level from messages where id = $1", [apple.id])).rows[0];
+  assert.deepEqual(clickSummary, { click_count: 0, open_count: 0, engagement_level: "unknown" });
+  const excludedClickPage = await request(`/messages/${apple.id}`, { headers: { cookie } });
+  assert.match(await excludedClickPage.text(), /Include this click/);
+  await invokeAction("toggleClick", { messageId: apple.id, clickId: clickEvent.id, human: true });
+  clickSummary = (await pg.query("select click_count, open_count, engagement_level from messages where id = $1", [apple.id])).rows[0];
+  assert.deepEqual(clickSummary, { click_count: 1, open_count: 0, engagement_level: "likely" });
+  const includedClickPage = await request(`/messages/${apple.id}`, { headers: { cookie } });
+  assert.match(await includedClickPage.text(), /Exclude this click/);
   await invokeAction("markReplied", { id: apple.id });
   await invokeAction("toggleOpen", { messageId: apple.id, openId: appleEvents.rows[0].id, human: true });
   let corrected = await pg.query("select open_count, open_confidence, engagement_level from messages where id = $1", [apple.id]);

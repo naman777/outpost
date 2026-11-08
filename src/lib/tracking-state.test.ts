@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import * as schema from "../db/schema";
 import { randomId } from "./crypto";
 import { computeEngagement } from "./engagement";
-import { trackingSummaryQuery, setOpenInclusion } from "./recount";
+import { trackingSummaryQuery, setClickInclusion, setOpenInclusion } from "./recount";
 import { recordReply } from "./reply-events";
 
 test("stored tracking evidence remains consistent through recounts, corrections and replies", async (t) => {
@@ -91,6 +91,48 @@ test("stored tracking evidence remains consistent through recounts, corrections 
       assert.deepEqual(result.openSources, []);
       const [eventAfter] = await store.select().from(schema.opens).where(eq(schema.opens.id, event.id));
       assert.equal(eventAfter.source, "apple", "Keep the original source for inspection");
+    });
+    await t.test("click overrides refresh totals, preserve source and remain scoped to their message", async () => {
+      const m = await addMessage({ trackClicks: true });
+      const other = await addMessage({ trackClicks: true });
+      await store.insert(schema.links).values({ id: "override-link", messageId: m.id, url: "https://example.com", position: 0 });
+      const [event] = await store.insert(schema.clicks).values({ messageId: m.id, linkId: "override-link", at, ip: "203.0.113.4", source: "self", confidence: "none", isHuman: false, reason: "from an operator IP" }).returning();
+      await setClickInclusion(other.id, event.id, true);
+      assert.equal((await rebuild(m.id)).clickCount, 0, "Cannot change another message's click");
+      await setClickInclusion(m.id, event.id, true);
+      let [result] = await store.select().from(schema.messages).where(eq(schema.messages.id, m.id));
+      assert.equal(result.clickCount, 1, "Override refreshes totals immediately");
+      assert.equal(result.firstClickedAt?.getTime(), at.getTime());
+      assert.equal(result.engagementLevel, "likely");
+      assert.equal(result.rawClickCount, 1);
+      assert.equal(result.openCount, 0);
+      assert.equal(result.firstOpenedAt, null);
+      let [link] = await store.select().from(schema.links).where(eq(schema.links.id, "override-link"));
+      assert.equal(link.clickCount, 1);
+      const [eventAfter] = await store.select().from(schema.clicks).where(eq(schema.clicks.id, event.id));
+      assert.equal(eventAfter.source, "self");
+      assert.match(eventAfter.reason!, /manually included/);
+      assert.equal(eventAfter.counted, true);
+      assert.equal((await rebuild(m.id)).clickCount, 1, "Recounts retain the correction");
+      const [repeat] = await store.insert(schema.clicks).values({ messageId: m.id, linkId: "override-link", at: new Date(at.getTime() + 10000), ip: "203.0.113.4", source: "self", confidence: "none", isHuman: false }).returning();
+      await setClickInclusion(m.id, repeat.id, true);
+      assert.equal((await rebuild(m.id)).clickCount, 1, "Overrides respect deduplication");
+      await setClickInclusion(m.id, repeat.id, false);
+      await setClickInclusion(m.id, event.id, false);
+      [result] = await store.select().from(schema.messages).where(eq(schema.messages.id, m.id));
+      assert.equal(result.clickCount, 0);
+      assert.equal(result.firstClickedAt, null);
+      assert.equal(result.engagementLevel, "unknown");
+      assert.equal(result.rawClickCount, 2);
+      [link] = await store.select().from(schema.links).where(eq(schema.links.id, "override-link"));
+      assert.equal(link.clickCount, 0);
+    });
+    await t.test("click overrides cannot turn disabled tracking on", async () => {
+      const m = await addMessage({ trackClicks: false });
+      await store.insert(schema.links).values({ id: "disabled-click-link", messageId: m.id, url: "https://example.com", position: 0 });
+      const [event] = await store.insert(schema.clicks).values({ messageId: m.id, linkId: "disabled-click-link", at, source: "self", confidence: "none", isHuman: false }).returning();
+      await setClickInclusion(m.id, event.id, true);
+      assert.equal((await rebuild(m.id)).clickCount, 0);
     });
     await t.test("reply recording is idempotent and works with pixels off without inventing opens", async () => {
       const m = await addMessage({ tracked: false });

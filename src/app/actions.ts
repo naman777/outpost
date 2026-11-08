@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { accounts, applications, db, messages } from "@/db";
 import { encrypt } from "@/lib/crypto";
 import { resolveApplication } from "@/lib/apps";
-import { setOpenInclusion } from "@/lib/recount";
+import { setClickInclusion, setOpenInclusion } from "@/lib/recount";
 import { recordReply } from "@/lib/reply-events";
 import { STATUSES } from "@/lib/pipeline";
 import { PRESETS, smtpTransport } from "@/lib/providers/smtp";
@@ -192,6 +192,15 @@ export async function toggleOpen(f: FormData) {
   const human = f.get("human") === "true";
   await setOpenInclusion(messageId, id, human);
   revalidatePath(`/messages/${messageId}`);
+}
+
+export async function toggleClick(f: FormData) {
+  await requireDashboardSession();
+  const id = Number(str(f, "clickId"));
+  if (!Number.isSafeInteger(id) || id < 1) throw new Error("Invalid click ID");
+  const messageId = recordId.parse(str(f, "messageId"));
+  await setClickInclusion(messageId, id, f.get("human") === "true");
+  for (const path of [`/messages/${messageId}`, "/messages", "/", "/insights"]) revalidatePath(path);
 }
 
 export async function deleteMessage(f: FormData) {
