@@ -67,7 +67,7 @@ Outpost requests `gmail.send`, `gmail.readonly`, `openid` and `email`. Readonly 
 ## Deploy on Vercel
 
 1. Import your own repository as a new Vercel project, using the Next.js preset. This does not require changing the separate repository or Vercel project you already use for personal outreach.
-2. Provision a separate hosted Postgres database reachable from Vercel. Choose a nearby region; `vercel.json` currently selects `sin1` (Singapore), which you can change for your own database location.
+2. Provision a separate hosted Postgres database reachable from Vercel. Choose a nearby region; `vercel.json` currently selects `bom1` (Mumbai, India), which you can change for your own database location.
 3. Generate independent production secrets locally with Node's crypto API or a password manager. Add all required variables in the Vercel project settings. Set `APP_URL` to the stable production HTTPS origin, not localhost or a temporary preview URL. Do not paste production secrets into a public issue, screenshot or chat.
 4. Initialize the empty hosted schema from a terminal with `DATABASE_URL` set for that database, using `npm run db:push`. Keep this operation manual; the build does not push database schema changes.
 5. Deploy, sign in, connect a mailbox and perform the controlled check below. Keep preview deployments separate from production: use an isolated database/mailbox, or leave sensitive env values unavailable to previews. Review contribution code before running it with secrets.
