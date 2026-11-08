@@ -198,6 +198,27 @@ try {
   assert.ok([303, 307].includes(directAction.status), "Unauthenticated action must redirect to sign-in");
   const cron = await request("/api/cron/sync", { headers: { authorization: `Bearer ${env.CRON_SECRET}` } });
   assert.equal(cron.status, 200);
+  const bulkAccount = (await pg.query("insert into accounts (label,email,kind,daily_limit) values ('Bulk fixture','sender@example.com','smtp',1) returning id")).rows[0];
+  const bulkSent = (await pg.query("insert into messages (tracking_id,account_id,channel,to_email,subject,status,sent_at) values ('bulk-sent-fixture',$1,'smtp','alex@example.com','Already sent','sent',now()) returning id", [bulkAccount.id])).rows[0];
+  const bulkBody = { requestId: bulkSent.id, accountId: bulkAccount.id, to: "alex@example.com", subject: "Already sent", text: "Fictional email" };
+  const sendBulk = (body, headers = {}) => request("/api/bulk/send", { method: "POST", headers: { origin, cookie, "content-type": "application/json", ...headers }, body: JSON.stringify(body) });
+  assert.equal((await sendBulk(bulkBody, { cookie: "" })).status, 401);
+  assert.equal((await sendBulk(bulkBody, { origin: "https://evil.example" })).status, 403);
+  assert.equal((await sendBulk({ ...bulkBody, to: "invalid" })).status, 400);
+  const replay = await sendBulk(bulkBody);
+  assert.equal(replay.status, 200);
+  assert.equal((await replay.json()).duplicate, true);
+  assert.equal((await sendBulk({ ...bulkBody, to: "other@example.com" })).status, 409);
+  const quotaId = "3af0ab01-dc8e-4d67-9879-a0d92e6b2019";
+  assert.equal((await sendBulk({ ...bulkBody, requestId: quotaId })).status, 429);
+  assert.equal((await pg.query("select count(*)::int as n from messages where id=$1", [quotaId])).rows[0].n, 0);
+  if (process.argv.includes("--browser")) {
+    const { checkBulkBrowser } = await import("./bulk-browser.mjs");
+    await checkBulkBrowser({ origin, cookie });
+  }
+  await pg.query("delete from messages where id=$1", [bulkSent.id]);
+  await pg.query("delete from accounts where id=$1", [bulkAccount.id]);
+  console.log("Passed: bulk endpoint session/origin protection, replay protection and mailbox limit without contacting SMTP.");
   if (process.argv.includes("--screenshots")) {
     const { captureScreenshots } = await import("./capture-screenshots.mjs");
     await captureScreenshots({ pg, origin, cookie });

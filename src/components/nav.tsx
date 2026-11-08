@@ -7,6 +7,7 @@ const ITEMS = [
   { href: "/", label: "Overview" },
   { href: "/messages", label: "Sent mail" },
   { href: "/compose", label: "Compose" },
+  { href: "/bulk", label: "Bulk mail" },
   { href: "/insights", label: "Content insights" },
   { href: "/applications", label: "Applications" },
   { href: "/accounts", label: "Mailboxes" },

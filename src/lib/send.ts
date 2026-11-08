@@ -1,4 +1,4 @@
-import { and, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, isNull, sql } from "drizzle-orm";
 import MailComposer from "nodemailer/lib/mail-composer";
 import { accounts, db, links, messages, type Account, type Message } from "@/db";
 import { decrypt, randomId } from "./crypto";
@@ -10,6 +10,8 @@ import { htmlToText, injectPixel, rewriteLinks, textToHtml, wordCount } from "./
 export type Attachment = { filename: string; contentBase64: string; contentType?: string };
 
 export type NewMessage = {
+  /** Optional request ID for idempotent bulk sends. */
+  id?: string;
   to: string;
   toName?: string | null;
   subject: string;
@@ -50,6 +52,7 @@ export async function createTrackedMessage(input: NewMessage) {
   const [msg] = await db
     .insert(messages)
     .values({
+      id: input.id,
       trackingId,
       accountId: input.accountId ?? null,
       applicationId: input.applicationId ?? null,
@@ -85,19 +88,37 @@ export async function sentToday(accountId: string): Promise<number> {
   const [r] = await db
     .select({ n: sql<number>`count(*)::int` })
     .from(messages)
-    .where(and(eq(messages.accountId, accountId), gte(messages.sentAt, since), inArray(messages.status, ["sent", "bounced"])));
+    .where(and(eq(messages.accountId, accountId), gte(messages.sentAt, since), inArray(messages.status, ["draft", "sent", "bounced"])));
   return r.n;
+}
+
+export class MailboxLimitError extends Error {}
+
+/** Reserve capacity before contacting the provider, including concurrent bulk/manual sends. */
+export async function reserveDelivery(messageId: string, accountId: string) {
+  await db.transaction(async (tx) => {
+    const [account] = await tx.select().from(accounts).where(eq(accounts.id, accountId)).for("update");
+    if (!account?.active) throw new Error("Mailbox is missing or disabled");
+    const [message] = await tx.select().from(messages).where(eq(messages.id, messageId)).for("update");
+    if (!message || message.accountId !== accountId || message.status !== "draft" || message.sentAt) throw new Error("This message has already been attempted. Check Sent mail before trying again.");
+    const [used] = await tx.select({ n: sql<number>`count(*)::int` }).from(messages)
+      .where(and(eq(messages.accountId, accountId), gte(messages.sentAt, new Date(Date.now() - 24 * 3600 * 1000)), inArray(messages.status, ["draft", "sent", "bounced"])));
+    if (used.n >= account.dailyLimit) throw new MailboxLimitError(`Daily limit reached for ${account.email} (${used.n}/${account.dailyLimit} in the last 24 hours). Remaining recipients have not been sent.`);
+    await tx.update(messages).set({ sentAt: new Date() }).where(eq(messages.id, messageId));
+  });
 }
 
 /** Sends a stored draft through its account (Gmail API or SMTP) and records the provider ids. */
 export async function deliver(msg: Message, html: string, text: string, attachments: Attachment[] = []) {
   const [account] = await db.select().from(accounts).where(eq(accounts.id, msg.accountId!));
   if (!account) throw new Error("Account not found");
-  const used = await sentToday(account.id);
-  if (used >= account.dailyLimit) {
-    // Nothing went out, so don't keep the draft around as a failure.
-    await db.delete(messages).where(eq(messages.id, msg.id));
-    throw new Error(`Daily limit reached for ${account.email} (${used}/${account.dailyLimit} in the last 24h). Raise it on the Mailboxes page if you are sure.`);
+  try { await reserveDelivery(msg.id, account.id); }
+  catch (error) {
+    if (error instanceof MailboxLimitError) {
+      // No provider request happened; the same bulk row can be sent after capacity returns.
+      await db.delete(messages).where(and(eq(messages.id, msg.id), eq(messages.status, "draft"), isNull(messages.sentAt)));
+    }
+    throw error;
   }
 
   const parent = msg.followUpOf ? (await db.select().from(messages).where(eq(messages.id, msg.followUpOf)))[0] : undefined;

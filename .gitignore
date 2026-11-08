@@ -34,6 +34,7 @@
 *.dump
 *.xlsx
 *.csv
+!/public/bulk-recipients-example.csv
 /test-results/
 # Private implementation plans and local working notes.
 /docs/local/

@@ -70,6 +70,13 @@ Requires Node.js 20.9+ and Postgres; Node.js 22 LTS is a convenient baseline. Op
 | `npm run add:mailbox -- --email you@example.com --preset gmail --name "You"` | Adds a mailbox using MAILBOX_PASSWORD from the process environment. The dashboard is easier for first setup. |
 | `npm run db:push` / `db:studio` | Schema sync / browse the database. |
 
+## Bulk mail
+
+Import Excel or CSV recipients, insert `{{column_name}}` variables, preview personalized
+emails, and send shared attachments through a connected mailbox. See [bulk mail](docs/bulk-mail.md)
+for file limits, per-recipient progress, and mailbox limits. Sending runs in the open tab;
+there is no background queue or scheduled sending.
+
 ## API
 
 All `/api/v1/*` routes take `Authorization: Bearer $API_KEY`.
