@@ -30,7 +30,7 @@
     "imapflow": "^2.5.2",
     "next": "16.4.2",
     "nodemailer": "^10.4.0",
-    "postgres": "^3.4.9",
+    "postgres": "^4.0.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "read-excel-file": "^9.3.14",
