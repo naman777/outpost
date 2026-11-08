@@ -127,6 +127,10 @@ These are real app screens captured with fictional data in a disposable local da
 
 ![Outpost application pipeline with fictional data](docs/screenshots/applications.png)
 
+![Outpost bulk recipient import](docs/screenshots/bulk.png)
+
+The workspace also supports [dark mode](docs/screenshots/overview-dark.png) and [mobile layouts](docs/screenshots/overview-mobile.png).
+
 To regenerate: `npm ci`, `npx playwright install chromium`, `npm run build`, then `npm run screenshots`. This runs the isolated smoke checks and captures the fixture dashboard without using your database or sending mail.
 
 ## Deploy your own installation

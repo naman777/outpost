@@ -40,9 +40,10 @@ export async function captureScreenshots({ pg, origin, cookie }) {
     );
   }
   await mkdir("docs/screenshots", { recursive: true });
+  await pg.query("insert into accounts (label,email,kind) values ('Example mailbox','sender@example.com','smtp')");
   const browser = await chromium.launch();
   try {
-    const context = await browser.newContext({ viewport: { width: 1440, height: 1080 }, deviceScaleFactor: 1, colorScheme: "light" });
+    const context = await browser.newContext({ viewport: { width: 1440, height: 1080 }, deviceScaleFactor: 1, colorScheme: "light", reducedMotion: "reduce" });
     const separator = cookie.indexOf("=");
     await context.addCookies([{ name: cookie.slice(0, separator), value: cookie.slice(separator + 1), url: origin }]);
     // Screenshots must never fetch external content embedded in a message.
@@ -51,13 +52,30 @@ export async function captureScreenshots({ pg, origin, cookie }) {
       return url.origin === origin ? route.continue() : route.abort();
     });
     const page = await context.newPage();
-    for (const [name, path] of [["overview", "/"], ["applications", "/applications"]]) {
+    for (const [name, path] of [["overview", "/"], ["applications", "/applications"], ["messages", "/messages"], ["bulk", "/bulk"], ["compose", "/compose"], ["settings", "/settings"], ["login", "/login"]]) {
       await page.goto(origin + path, { waitUntil: "networkidle" });
-      await page.getByRole("navigation", { name: "Dashboard" }).waitFor();
+      if (path !== "/login") await page.getByRole("navigation", { name: "Dashboard" }).waitFor();
       await page.evaluate(() => document.fonts.ready);
       await page.screenshot({ path: `docs/screenshots/${name}.png`, fullPage: true, animations: "disabled" });
     }
-    console.log("Captured overview and applications screenshots with fictional data only.");
+    await page.evaluate(() => localStorage.setItem("mp-theme", "dark"));
+    await page.goto(origin, { waitUntil: "networkidle" });
+    await page.screenshot({ path: "docs/screenshots/overview-dark.png", fullPage: true, animations: "disabled" });
+    await page.evaluate(() => localStorage.setItem("mp-theme", "light"));
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const [name, path] of [["overview", "/"], ["messages", "/messages"], ["bulk", "/bulk"], ["login", "/login"]]) {
+      await page.goto(origin + path, { waitUntil: "networkidle" });
+      const overflows = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+      if (overflows) throw new Error(`Horizontal overflow on mobile ${path}`);
+      await page.screenshot({ path: `docs/screenshots/${name}-mobile.png`, fullPage: true, animations: "disabled" });
+    }
+    await page.goto(origin, { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Open navigation", exact: true }).click();
+    await page.getByRole("navigation", { name: "Dashboard" }).waitFor();
+    await page.getByRole("link", { name: "Bulk mail", exact: true }).click();
+    await page.getByRole("heading", { name: "Bulk mail", exact: true }).waitFor();
+    if (await page.getByRole("button", { name: "Open navigation", exact: true }).count() !== 1) throw new Error("Mobile navigation did not close after selection");
+    console.log("Captured desktop, mobile and dark-mode screens; mobile navigation and overflow checks passed with fictional data only.");
   } finally {
     await browser.close();
   }
