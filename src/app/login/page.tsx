@@ -6,7 +6,7 @@ export default async function Login({ searchParams }: PageProps<"/login">) {
       <form action="/api/auth/login" method="post" className="card w-full max-w-sm space-y-4 p-6">
         <div className="flex items-center gap-2">
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500" />
-          <h1 className="font-semibold tracking-tight">MailPulse</h1>
+          <h1 className="font-semibold tracking-tight">Outpost</h1>
         </div>
         <input type="hidden" name="next" value={typeof sp.next === "string" ? sp.next : "/"} />
         <div>

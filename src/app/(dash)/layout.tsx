@@ -12,7 +12,7 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
         <div className="mb-3 flex items-center justify-between md:mb-6">
           <div className="flex items-center gap-2 px-2">
             <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500" />
-            <span className="font-semibold tracking-tight">MailPulse</span>
+            <span className="font-semibold tracking-tight">Outpost</span>
           </div>
           <div className="flex items-center gap-3 md:hidden">
             <ThemeToggle />

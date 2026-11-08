@@ -7,7 +7,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MailPulse",
+  title: "Outpost",
   description: "Email open, click and reply tracking with a job-application pipeline",
   robots: { index: false, follow: false },
 };

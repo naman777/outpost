@@ -1,5 +1,5 @@
 {
-  "name": "mailpulse",
+  "name": "outpost",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -20,7 +20,8 @@
     "db:studio": "drizzle-kit studio",
     "typecheck": "next typegen && tsc --noEmit",
     "add:mailbox": "tsx scripts/add-smtp-account.ts",
-    "import:tracker": "tsx scripts/import-outreach.ts"
+    "import:tracker": "tsx scripts/import-outreach.ts",
+    "screenshots": "node scripts/smoke.mjs --screenshots"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",
@@ -44,8 +45,19 @@
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
+    "playwright": "^1.65.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5"
-  }
+  },
+  "license": "MIT",
+  "description": "Self-hosted email tracking and outreach application pipeline",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/naman777/outpost.git"
+  },
+  "bugs": {
+    "url": "https://github.com/naman777/outpost/issues"
+  },
+  "homepage": "https://github.com/naman777/outpost#readme"
 }

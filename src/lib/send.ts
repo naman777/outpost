@@ -32,7 +32,7 @@ export type NewMessage = {
   messageIdHeader?: string | null;
 };
 
-const domainOf = (email: string | null | undefined) => email?.split("@")[1]?.toLowerCase() || "mailpulse.local";
+const domainOf = (email: string | null | undefined) => email?.split("@")[1]?.toLowerCase() || "outpost.local";
 
 /**
  * Stores the message and returns the HTML to send: the pixel is appended and,

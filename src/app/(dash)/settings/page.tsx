@@ -79,7 +79,7 @@ export default async function SettingsPage() {
 #     "messageId": "<…@gmail.com>", "pixelHtml": "<img …>" }
 # Send "html" as the HTML part and "messageId" as the Message-ID header.
 
-# Or let MailPulse send through a connected mailbox:
+# Or let Outpost send through a connected mailbox:
 curl -X POST ${base}/api/v1/send -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" \\
   -d '{"from":"you@gmail.com","to":"founder@startup.com","subject":"Hello","text":"Hi …",
        "attachments":[{"filename":"resume.pdf","contentBase64":"…"}]}'
@@ -87,7 +87,7 @@ curl -X POST ${base}/api/v1/send -H "Authorization: Bearer $API_KEY" -H "Content
 # Stats
 curl ${base}/api/v1/stats?days=30 -H "Authorization: Bearer $API_KEY"`}</pre>
         <p className="mt-3 text-xs text-zinc-500">
-          A ready-made Python helper is in <code>clients/mailpulse_client.py</code> in the repo.
+          A ready-made Python helper is in <code>clients/outpost_client.py</code> in the repo.
         </p>
       </section>
     </>
