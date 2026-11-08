@@ -9,13 +9,13 @@ const RANGES = [
 
 export function RangeTabs({ current, base, params = {} }: { current: string; base: string; params?: Record<string, string> }) {
   return (
-    <div className="grid w-full grid-cols-4 rounded-lg border sm:w-auto border-zinc-300 bg-white p-0.5">
+    <div className="range-tabs" aria-label="Date range">
       {RANGES.map((r) => (
         <Link
           key={r.v}
           href={`${base}?${new URLSearchParams({ ...params, range: r.v })}`}
           aria-current={current === r.v ? "true" : undefined}
-          className={`grid min-h-10 place-items-center rounded-md px-2 text-center text-xs font-medium sm:min-h-8 ${current === r.v ? "bg-zinc-900 text-white" : "text-zinc-600 hover:text-zinc-900"}`}
+          className="range-tab"
         >
           {r.label}
         </Link>

@@ -12,17 +12,17 @@ export function DailyChart({ data }: { data: Row[] }) {
         <ResponsiveContainer>
           <BarChart data={rows} margin={{ top: 8, right: 8, bottom: 0, left: 0 }} barGap={1}>
             <CartesianGrid vertical={false} stroke="rgba(128,128,128,0.2)" />
-            <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#8b8b94" }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-            <YAxis width="auto" allowDecimals={false} tick={{ fontSize: 11, fill: "#8b8b94" }} tickLine={false} axisLine={false} />
+            <XAxis dataKey="label" tick={{ fontSize: 11, fill: "var(--color-zinc-500)" }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+            <YAxis width="auto" allowDecimals={false} tick={{ fontSize: 11, fill: "var(--color-zinc-500)" }} tickLine={false} axisLine={false} />
             <Tooltip
               cursor={{ fill: "rgba(128,128,128,0.12)" }}
               contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid var(--color-zinc-200)", background: "var(--color-white)", color: "var(--page-fg)" }}
             />
-            <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
-            <Bar dataKey="sent" name="Sent" fill="#a1a1aa" radius={[3, 3, 0, 0]} />
-            <Bar dataKey="opened" name="Estimated opens" fill="#0ea5e9" radius={[3, 3, 0, 0]} />
-            <Bar dataKey="replied" name="Replied" fill="#10b981" radius={[3, 3, 0, 0]} />
-            <Bar dataKey="bounced" name="Bounced" fill="#ef4444" radius={[3, 3, 0, 0]} />
+            <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} formatter={(value) => <span className="text-zinc-600">{value}</span>} />
+            <Bar dataKey="sent" name="Sent" fill="#7b9586" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="opened" name="Estimated opens" fill="#459384" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="replied" name="Replied" fill="var(--accent)" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="bounced" name="Bounced" fill="#c38378" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

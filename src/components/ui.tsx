@@ -1,25 +1,26 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { Icon } from "./icon";
 import { computeEngagement, ENGAGEMENT_LABEL, OPEN_ACCURACY_NOTE, type EngagementEvidence } from "@/lib/engagement";
 
 export function PageHeader({ title, sub, children }: { title: string; sub?: ReactNode; children?: ReactNode }) {
   return (
-    <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+    <header className="page-header">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
-        {sub && <p className="mt-1 max-w-prose text-sm leading-relaxed text-zinc-600">{sub}</p>}
+        <h1 className="page-title">{title}</h1>
+        {sub && <p className="page-subtitle">{sub}</p>}
       </div>
-      {children && <div className="flex flex-wrap items-center gap-2">{children}</div>}
+      {children && <div className="header-actions">{children}</div>}
     </header>
   );
 }
 
-export function Stat({ label, value, hint }: { label: string; value: ReactNode; hint?: ReactNode }) {
+export function Stat({ label, value, hint, icon, compact = false }: { label: string; value: ReactNode; hint?: ReactNode; icon?: ReactNode; compact?: boolean }) {
   return (
-    <div className="card px-3 py-3 sm:p-4">
-      <div className="text-xs font-medium text-zinc-500">{label}</div>
-      <div className="mt-1 text-2xl leading-tight font-semibold tabular-nums tracking-tight sm:text-3xl">{value}</div>
-      {hint && <div className="mt-1 text-xs text-zinc-500">{hint}</div>}
+    <div className={compact ? "stat-compact" : "stat-card"}>
+      <div className="stat-label">{label}{icon}</div>
+      <div className="stat-value">{value}</div>
+      {hint && <div className="stat-hint">{hint}</div>}
     </div>
   );
 }
@@ -34,7 +35,7 @@ const TONES = {
 };
 
 export function Badge({ tone = "zinc", children }: { tone?: keyof typeof TONES; children: ReactNode }) {
-  return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${TONES[tone]}`}>{children}</span>;
+  return <span className={`badge ${TONES[tone]}`}>{children}</span>;
 }
 
 export const STATUS_TONE: Record<string, keyof typeof TONES> = {
@@ -72,7 +73,7 @@ export function EngagementBadge({ m }: { m: EngagementEvidence }) {
 }
 
 export function Empty({ children }: { children: ReactNode }) {
-  return <div className="rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500">{children}</div>;
+  return <div className="empty-state"><Icon name="mail" /><div>{children}</div></div>;
 }
 
 export function RateBar({ value }: { value: number | null }) {

@@ -72,6 +72,9 @@ try {
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
   assert.ok(ready, "Fixture app did not become ready");
+  const iconResponse = await request("/icon.svg");
+  assert.equal(iconResponse.status, 200, "The branded icon must load before sign-in");
+  await iconResponse.arrayBuffer();
   if (process.argv.includes("--browser")) {
     const { checkBrowserAuth } = await import("./browser-auth.mjs");
     await checkBrowserAuth({ origin, password: env.DASHBOARD_PASSWORD });

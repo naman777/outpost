@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { Icon } from "./icon";
 
 type Theme = "system" | "light" | "dark";
 const ORDER: Theme[] = ["system", "light", "dark"];
@@ -39,8 +40,8 @@ export function ThemeToggle() {
   }
 
   return (
-    <button onClick={next} className="min-h-11 px-2 text-xs text-zinc-600 hover:text-zinc-900 md:min-h-0 md:px-0" title="Switch theme">
-      {theme === "dark" ? "☾" : theme === "light" ? "☀" : "◐"} {LABEL[theme]}
+    <button onClick={next} className="theme-button" title="Switch theme" aria-label={`Switch theme, currently ${LABEL[theme].toLowerCase()}`}>
+      <Icon name={theme === "dark" ? "moon" : theme === "light" ? "sun" : "monitor"} /><span>{LABEL[theme]}</span>
     </button>
   );
 }

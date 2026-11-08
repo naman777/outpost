@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Icon } from "@/components/icon";
 import { DailyChart } from "@/components/daily-chart";
 import { RangeTabs, rangeDays, rangeKey } from "@/components/range-tabs";
 import { SyncButton } from "@/components/sync-button";
@@ -27,38 +28,41 @@ export default async function Overview({ searchParams }: PageProps<"/">) {
 
   return (
     <>
-      <PageHeader title="Overview" sub="How your outreach is landing.">
+      <PageHeader title="Overview" sub="Delivery, engagement, and the conversations worth following up.">
         <RangeTabs current={key} base="/" />
         <SyncButton />
+        <Link href="/compose" className="btn"><Icon name="compose" />New email</Link>
       </PageHeader>
 
       <div className="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
-        <Stat label="Sent" value={t.sent} hint={`${t.delivered} delivered · ${t.bounced} bounced`} />
-        <Stat label="Estimated open rate" value={pct(t.openRate)} hint={`${t.opened} of ${t.tracked} tracked emails`} />
-        <Stat label="Reply rate" value={pct(t.replyRate)} hint={`${t.replied} replies`} />
+        <Stat label="Sent" icon={<Icon name="mail" />} value={t.sent} hint={`${t.delivered} delivered · ${t.bounced} bounced`} />
+        <Stat label="Estimated open rate" icon={<Icon name="eye" />} value={pct(t.openRate)} hint={`${t.opened} of ${t.tracked} tracked emails`} />
+        <Stat label="Reply rate" icon={<Icon name="reply" />} value={pct(t.replyRate)} hint={`${t.replied} replies`} />
         <Stat
           label="Estimated click rate"
+          icon={<Icon name="click" />}
           value={pct(t.clickRate)}
           hint={t.linkTracked ? `${t.clicked} of ${t.linkTracked} with link tracking` : "link tracking is off"}
         />
-        <Stat label="Median to first estimated open" value={duration(t.medianOpenMin)} />
-        <Stat label="Median time to reply" value={duration(t.medianReplyHours == null ? null : t.medianReplyHours * 60)} />
-        <Stat label="Likely activity" value={t.engagementCounts.likely} hint="filtered clicks or correlated image loads" />
-        <Stat label="Pixel hits not counted" value={machine} hint={`${human} included image-load estimates`} />
+      </div>
+      <div className="metric-strip">
+        <Stat compact label="Median to first estimated open" value={duration(t.medianOpenMin)} />
+        <Stat compact label="Median time to reply" value={duration(t.medianReplyHours == null ? null : t.medianReplyHours * 60)} />
+        <Stat compact label="Likely activity" value={t.engagementCounts.likely} hint="filtered clicks or correlated image loads" />
+        <Stat compact label="Pixel hits not counted" value={machine} hint={`${human} included image-load estimates`} />
       </div>
 
-      <section className="card mt-6 p-4">
-        <h2 className="text-sm font-semibold">Engagement evidence</h2>
-        <p className="mt-2 text-xs text-zinc-500">{OPEN_ACCURACY_NOTE}</p>
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
-          {ENGAGEMENT_LEVELS.map((level) => <div key={level}><div className="text-xs text-zinc-500">{ENGAGEMENT_LABEL[level]}</div><div className="mt-1 text-xl font-semibold tabular-nums">{t.engagementCounts[level]}</div></div>)}
-        </div>
-      </section>
-
-      <section className="card mt-6 p-4">
-        <h2 className="mb-2 text-sm font-semibold">Daily volume</h2>
-        <DailyChart data={series} />
-      </section>
+      <div className="mt-6 grid gap-5 xl:grid-cols-3">
+        <section className="card p-5 xl:col-span-2">
+          <h2 className="section-heading">Daily volume</h2><p className="mb-5 mt-1 text-xs text-zinc-500">Your sending and engagement over time.</p>
+          <DailyChart data={series} />
+        </section>
+        <section className="card p-5">
+          <h2 className="section-heading">Engagement evidence</h2>
+          <div className="mt-3">{ENGAGEMENT_LEVELS.map((level) => <div className="evidence-row" key={level}><span className="text-xs text-zinc-500">{ENGAGEMENT_LABEL[level]}</span><span className="evidence-value">{t.engagementCounts[level]}</span></div>)}</div>
+          <p className="mt-4 text-[11px] leading-relaxed text-zinc-500">{OPEN_ACCURACY_NOTE}</p>
+        </section>
+      </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <section className="card p-4">

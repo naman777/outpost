@@ -4,6 +4,7 @@ import { useActionState, useRef, useState } from "react";
 import Link from "next/link";
 import { importBulkFile } from "@/app/bulk-actions";
 import { prepareBulkRows, type BulkRow, type PreparedRecipient } from "@/lib/bulk-template";
+import { Icon } from "./icon";
 
 type Mailbox = { id: string; email: string; label: string; dailyLimit: number; remaining: number };
 type Attachment = { filename: string; contentType?: string; contentBase64: string };
@@ -14,15 +15,17 @@ export function BulkMailForm({ accounts }: { accounts: Mailbox[] }) {
   const [state, action, pending] = useActionState(importBulkFile, {});
   if (!accounts.length) return <p className="card p-5">Connect a mailbox on the <Link href="/accounts" className="underline">Mailboxes page</Link> before sending bulk mail.</p>;
   if (state.rows && state.columns) return <BulkComposer accounts={accounts} rows={state.rows} columns={state.columns} />;
-  return <form action={action} className="card max-w-2xl space-y-4 p-5">
-    <h2 className="font-semibold">1. Import recipients</h2>
-    <p className="text-sm text-zinc-500">Use a header row with an email column and any personalization fields, such as name and company. Excel imports read the first worksheet. Up to 1,000 rows and 1 MiB.</p>
-    <label htmlFor="recipients" className="label">Excel (.xlsx) or CSV file</label>
-    <input id="recipients" name="recipients" type="file" accept=".xlsx,.csv" required className="block max-w-full text-sm" />
-    <a href="/bulk-recipients-example.csv" download className="block text-sm underline">Download an example CSV</a>
-    {state.error && <p role="alert" className="text-sm text-red-600">{state.error}</p>}
-    <button className="btn" disabled={pending}>{pending ? "Reading file…" : "Import recipients"}</button>
-  </form>;
+  return <><BulkSteps current={1} /><div className="bulk-import-grid"><form action={action} className="card bulk-upload">
+    <h2 className="text-base font-semibold">Start with your recipients</h2>
+    <p className="mt-2 text-sm leading-relaxed text-zinc-500">Upload a spreadsheet. You’ll personalize the email and review every recipient before anything is sent.</p>
+    <div className="upload-area"><span className="upload-icon"><Icon name="upload" /></span><label htmlFor="recipients" className="label mb-0">Excel (.xlsx) or CSV file</label><input id="recipients" name="recipients" type="file" accept=".xlsx,.csv" required className="block max-w-full text-sm" /><span className="text-[10px] text-zinc-400">Up to 1,000 recipients · 1 MiB maximum</span></div>
+    {state.error && <p role="alert" className="mb-4 text-sm text-red-600">{state.error}</p>}
+    <div className="flex flex-wrap items-center justify-between gap-4"><a href="/bulk-recipients-example.csv" download className="text-xs text-zinc-500 underline underline-offset-4">Download an example CSV</a><button className="btn" disabled={pending}>{pending ? "Reading file…" : "Import recipients"}<Icon name="arrow" /></button></div>
+  </form><aside className="bulk-guide"><h3>A few columns. A personal touch.</h3><p>Include one email column and any details you’d like to use in your message. Headers become variables, such as <code>{"{{name}}"}</code> and <code>{"{{company}}"}</code>.</p><div className="sheet-sample"><table><thead><tr><th>email</th><th>name</th><th>company</th></tr></thead><tbody><tr><td>alex@example.com</td><td>Alex</td><td>Cedar</td></tr><tr><td>sam@example.com</td><td>Sam</td><td>Harbor</td></tr></tbody></table></div><p className="mt-4">Excel imports use the first worksheet. Duplicate addresses and missing details are flagged during review.</p></aside></div></>;
+}
+
+function BulkSteps({ current }: { current: number }) {
+  return <ol className="bulk-steps" aria-label="Bulk mail steps">{["Import recipients", "Personalize", "Review & send"].map((label, index) => <li key={label} className={`bulk-step ${current === index + 1 ? "is-current" : current > index + 1 ? "is-complete" : ""}`} aria-current={current === index + 1 ? "step" : undefined}><span className="bulk-step-number">{current > index + 1 ? <Icon name="check" /> : index + 1}</span><span>{label}</span></li>)}</ol>;
 }
 
 function BulkComposer({ accounts, rows, columns }: { accounts: Mailbox[]; rows: BulkRow[]; columns: string[] }) {
@@ -101,6 +104,7 @@ function BulkComposer({ accounts, rows, columns }: { accounts: Mailbox[]; rows: 
   const attempted = batch?.recipients.some((row) => row.status !== "ready");
   const selected = batch?.recipients[preview];
   return <div className="space-y-5">
+    <BulkSteps current={batch ? 3 : 2} />
     {!batch ? <form onSubmit={review} className="grid gap-5 lg:grid-cols-3">
       <section className="card space-y-4 p-5 lg:col-span-2">
         <h2 className="font-semibold">2. Personalize your email</h2>
