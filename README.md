@@ -1,4 +1,8 @@
-# MailPulse
+# Outpost
+
+[![CI](https://github.com/naman777/outpost/actions/workflows/ci.yml/badge.svg)](https://github.com/naman777/outpost/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 
 Self-hosted email tracking (opens, clicks, replies, bounces) plus a job-application pipeline that replaces the Excel tracker. Next.js 16, Postgres (Neon works out of the box), Drizzle.
 
@@ -36,12 +40,14 @@ Confidence and engagement are explained in [the tracking guide](docs/open-tracki
 2. **Connected mailbox: SMTP + IMAP.** Sends over SMTP and reads replies and bounces over IMAP. Host presets are provided for common services, but a preset does not guarantee password authentication is enabled by that provider. See the Gmail app-password walkthrough in the setup guide. Each mailbox has its own send limit.
 3. **General, no connection.** Track mail you send from anywhere:
    - **Compose → "Any mail client"** gives you the email with the pixel built in. Copy it, paste into Gmail/Outlook web, send.
-   - **API**: `POST /api/v1/messages` registers an email and returns the HTML with the pixel and a Message-ID. Send it with your own script. See [clients/mailpulse_client.py](clients/mailpulse_client.py).
+   - **API**: `POST /api/v1/messages` registers an email and returns the HTML with the pixel and a Message-ID. Send it with your own script. See [clients/outpost_client.py](clients/outpost_client.py).
    - If the `from` address is also connected (option 2), replies to this mail are found too.
 
 ## Setup
 
 ```bash
+git clone https://github.com/naman777/outpost.git
+cd outpost
 npm ci
 npm run setup               # creates .env.local with independent random secrets; never overwrites
 # Set DATABASE_URL in .env.local to your own empty Postgres database.
@@ -103,3 +109,27 @@ src/app/api/v1        public API              src/lib/sync.ts       reply + boun
 src/app/(dash)        dashboard pages         src/lib/stats.ts      rates, breakdowns, follow-ups due
 src/db/schema.ts      tables                  scripts/              importer, add-mailbox CLI
 ```
+
+## Screenshots
+
+These are real app screens captured with fictional data in a disposable local database. No real inbox is connected.
+
+![Outpost outreach overview with fictional data](docs/screenshots/overview.png)
+
+![Outpost application pipeline with fictional data](docs/screenshots/applications.png)
+
+To regenerate: `npm ci`, `npx playwright install chromium`, `npm run build`, then `npm run screenshots`. This runs the isolated smoke checks and captures the fixture dashboard without using your database or sending mail.
+
+## Deploy your own installation
+
+Follow the [production setup guide](docs/setup.md#deploy-on-vercel) and [launch checklist](docs/launch-checklist.md). You need a separate Postgres database, independent production secrets, and a stable HTTPS origin. Schema initialization is a manual step; deploying the app does not initialize the database.
+
+## Contributing and security
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local checks and pull requests, [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for community expectations, and [SECURITY.md](SECURITY.md) to report a vulnerability privately. Bug reports and feature requests belong in [GitHub Issues](https://github.com/naman777/outpost/issues).
+
+For new Python integrations, import `outpost_client` and set `OUTPOST_URL` and `OUTPOST_API_KEY`. Existing `mailpulse_client` imports and `MAILPULSE_URL` / `MAILPULSE_API_KEY` variables remain supported.
+
+## License
+
+[MIT](LICENSE), copyright 2026 Naman Kundra.

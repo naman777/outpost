@@ -1,6 +1,6 @@
-# Set up your own MailPulse
+# Set up your own Outpost
 
-MailPulse is a single-user application. Use a separate database and independent secrets for every installation. Connecting your personal inbox to a shared public demo is unsuitable; examples in this repository use fictional contacts.
+Outpost is a single-user application. Use a separate database and independent secrets for every installation. Connecting your personal inbox to a shared public demo is unsuitable; examples in this repository use fictional contacts.
 
 ## Local setup
 
@@ -13,7 +13,7 @@ MailPulse is a single-user application. Use a separate database and independent 
    ```
 
    This generates four independent secrets in the ignored `.env.local`. It does not overwrite an existing file or print the secrets. On Windows, keep this file under your own user account's access controls.
-3. Edit `.env.local`. Set `DATABASE_URL` to your own Postgres connection URL. Hosted databases typically provide an SSL connection string; retain their SSL options. For local Postgres, the format is `postgresql://USER:PASSWORD@localhost:5432/mailpulse`. Create that database first and URL-encode special characters in the username/password. Keep `APP_URL="http://localhost:3000"` for local use.
+3. Edit `.env.local`. Set `DATABASE_URL` to your own Postgres connection URL. Hosted databases typically provide an SSL connection string; retain their SSL options. For local Postgres, the format is `postgresql://USER:PASSWORD@localhost:5432/outpost`. Create that database first and URL-encode special characters in the username/password. Keep `APP_URL="http://localhost:3000"` for local use.
 4. Run:
 
    ```sh
@@ -47,22 +47,22 @@ Never prefix these secrets with `NEXT_PUBLIC_`. Losing or replacing `APP_SECRET`
 
 This is the documented first-provider path. It requires an account where Google permits app passwords. Enable 2-Step Verification and create a dedicated app password; do not use your regular Gmail password. Workspace administrators and some account protection settings can prevent app-password use. See [Google's app-password instructions](https://support.google.com/accounts/answer/185833).
 
-1. Sign in to MailPulse and open **Mailboxes**.
+1. Sign in to Outpost and open **Mailboxes**.
 2. Choose **Gmail / Google Workspace (app password)**.
 3. Enter your full address, the dedicated app password and your sender name. Keep the default limit of 20 while checking the installation.
-4. Connect. MailPulse verifies SMTP login before saving the encrypted credential. This does not yet verify IMAP, reply matching or inbox placement.
+4. Connect. Outpost verifies SMTP login before saving the encrypted credential. This does not yet verify IMAP, reply matching or inbox placement.
 5. Send one harmless test email to another address you own. Reply from that second address, then press **Check for replies**. Confirm the reply appears on the message timeline. A sync error means IMAP access needs attention even if sending worked.
 
-The Gmail preset uses SMTP 465 with TLS and IMAP 993 with TLS. SMTP servers configured for port 587 must support STARTTLS; MailPulse requires the upgrade. Other presets supply hosts/ports, not provider-specific OAuth. In particular, a provider that requires OAuth for SMTP/IMAP will not work with this password-only transport. Use Gmail API OAuth below for Gmail accounts where that is more suitable.
+The Gmail preset uses SMTP 465 with TLS and IMAP 993 with TLS. SMTP servers configured for port 587 must support STARTTLS; Outpost requires the upgrade. Other presets supply hosts/ports, not provider-specific OAuth. In particular, a provider that requires OAuth for SMTP/IMAP will not work with this password-only transport. Use Gmail API OAuth below for Gmail accounts where that is more suitable.
 
 ## Optional Gmail API OAuth
 
 1. Create a Google Cloud project, enable the Gmail API, and configure OAuth consent. Start with your own account as a test user.
 2. Create a **Web application** OAuth client. Register the exact redirect URI `http://localhost:3000/api/auth/google/callback` for local work and `https://YOUR-HOST/api/auth/google/callback` for the hosted installation.
 3. Set both Google env variables on the corresponding host and restart/redeploy.
-4. Sign in to the MailPulse dashboard, open Mailboxes and choose Connect Gmail. This connects the mailbox; it does not replace dashboard password authentication.
+4. Sign in to the Outpost dashboard, open Mailboxes and choose Connect Gmail. This connects the mailbox; it does not replace dashboard password authentication.
 
-MailPulse requests `gmail.send`, `gmail.readonly`, `openid` and `email`. Readonly access is a restricted Gmail scope. Testing-mode tokens can expire quickly; publishing an OAuth consent screen is not a substitute for Google's verification requirements. Review [Gmail scopes](https://developers.google.com/workspace/gmail/api/auth/scopes) and [restricted-scope verification and exceptions](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification) before expanding access beyond your own installation.
+Outpost requests `gmail.send`, `gmail.readonly`, `openid` and `email`. Readonly access is a restricted Gmail scope. Testing-mode tokens can expire quickly; publishing an OAuth consent screen is not a substitute for Google's verification requirements. Review [Gmail scopes](https://developers.google.com/workspace/gmail/api/auth/scopes) and [restricted-scope verification and exceptions](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification) before expanding access beyond your own installation.
 
 ## Deploy on Vercel
 
@@ -83,7 +83,7 @@ For a local check without a mailbox, run `npm run build`, then `npm run test:smo
 - API auth: `/api/v1/stats` rejects a request without a bearer key. Use your own key in a local script to check authorized access; never put it in a browser URL.
 - Mailbox: SMTP verification succeeds; one message sent to your own second inbox arrives; an actual reply appears after sync. No test suite in this repo sends mail automatically.
 - Public tracking: with a public HTTPS origin and images enabled, opening that test message produces a signal. Self-open filtering, a 20-second grace period for some clients, proxy caching and privacy protection can affect results. An open cannot prove the recipient read the email.
-- Tracking disabled: the API's `trackOpens: false` and `trackClicks: false` omit MailPulse tracking URLs. Send history and reply/bounce checks remain available.
+- Tracking disabled: the API's `trackOpens: false` and `trackClicks: false` omit Outpost tracking URLs. Send history and reply/bounce checks remain available.
 - Scheduled sync: an authenticated cron call runs; an unauthenticated call receives 401. Replies are polled, not pushed in real time.
 
 ## Troubleshooting

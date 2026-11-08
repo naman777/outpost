@@ -182,6 +182,10 @@ try {
   assert.ok([303, 307].includes(directAction.status), "Unauthenticated action must redirect to sign-in");
   const cron = await request("/api/cron/sync", { headers: { authorization: `Bearer ${env.CRON_SECRET}` } });
   assert.equal(cron.status, 200);
+  if (process.argv.includes("--screenshots")) {
+    const { captureScreenshots } = await import("./capture-screenshots.mjs");
+    await captureScreenshots({ pg, origin, cookie });
+  }
   for (let attempt = 0; attempt < 19; attempt++) await signIn("wrong");
   const limited = await signIn(env.DASHBOARD_PASSWORD);
   assert.equal(limited.status, 429);

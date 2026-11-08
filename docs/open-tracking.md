@@ -1,10 +1,10 @@
 # Open tracking and engagement evidence
 
-An image request is an estimate, not a read receipt. MailPulse keeps raw events, filtering decisions and deduplicated counts separate so you can inspect the evidence.
+An image request is an estimate, not a read receipt. Outpost keeps raw events, filtering decisions and deduplicated counts separate so you can inspect the evidence.
 
 ## Tracking controls
 
-`POST /api/v1/send` and `POST /api/v1/messages` accept `trackOpens` (boolean, default `true`). Set it to `false` to omit MailPulse's image. Leave `trackClicks: false` (the default) to avoid link rewriting too.
+`POST /api/v1/send` and `POST /api/v1/messages` accept `trackOpens` (boolean, default `true`). Set it to `false` to omit Outpost's image. Leave `trackClicks: false` (the default) to avoid link rewriting too.
 
 ```json
 {
@@ -17,7 +17,7 @@ An image request is an estimate, not a read receipt. MailPulse keeps raw events,
 }
 ```
 
-Send history, Message-ID, application association and reply/bounce checks still work with pixels off. Disabled pixels return no new events; registration returns `pixelUrl: null` and `pixelHtml: null`. Only MailPulse's own image is controlled: remote images supplied in your HTML remain.
+Send history, Message-ID, application association and reply/bounce checks still work with pixels off. Disabled pixels return no new events; registration returns `pixelUrl: null` and `pixelHtml: null`. Only Outpost's own image is controlled: remote images supplied in your HTML remain.
 
 ## Confidence categories
 
