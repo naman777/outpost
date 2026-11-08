@@ -30,6 +30,8 @@ npm run lint
 npm run typecheck
 npm run build
 npm run test:smoke
+npx playwright install chromium
+npm run test:browser
 ```
 
 Unit and smoke checks require no external database or mailbox. The smoke script starts a

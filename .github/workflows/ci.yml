@@ -33,7 +33,8 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run build
-      - run: npm run test:smoke
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
 
   secrets:
     name: Scan Git history for secrets

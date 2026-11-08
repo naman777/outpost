@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
     return [{ source: "/:path*", headers: [
       { key: "X-Content-Type-Options", value: "nosniff" },
       { key: "X-Frame-Options", value: "DENY" },
-      { key: "Referrer-Policy", value: "no-referrer" },
+      // Native form POSTs need their same-origin Origin header for CSRF checks.
+      { key: "Referrer-Policy", value: "same-origin" },
     ] }];
   },
   // every dashboard page reads live tracking data, so no Cache Components / prerendering

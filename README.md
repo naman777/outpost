@@ -96,6 +96,8 @@ npm run typecheck
 npm run lint
 npm run build
 npm run test:smoke
+npx playwright install chromium
+npm run test:browser
 ```
 
 These checks do not send mail. The smoke check starts a built app against an isolated, in-memory Postgres engine, pushes the schema and checks login, imports, dashboard pages, API validation and tracking endpoints. It never uses your DATABASE_URL or mailbox. See the setup guide for a controlled end-to-end check using a mailbox and recipient you own. Follow-ups are composed manually; the app does not run automated campaigns or maintain an unsubscribe/suppression system.

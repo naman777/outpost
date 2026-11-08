@@ -71,6 +71,7 @@ test("login and logout require a matching browser origin", () => {
     const req = (origin?: string) => new Request("https://mail.example.com/api/auth/login", { headers: origin ? { origin } : {} });
     assert.equal(sameOriginRequest(req("https://mail.example.com")), true);
     assert.equal(sameOriginRequest(req("https://evil.example")), false);
+    assert.equal(sameOriginRequest(req("null")), false);
     assert.equal(sameOriginRequest(req()), false);
   } finally {
     if (previous === undefined) delete process.env.APP_URL; else process.env.APP_URL = previous;

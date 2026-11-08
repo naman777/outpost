@@ -72,6 +72,10 @@ try {
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
   assert.ok(ready, "Fixture app did not become ready");
+  if (process.argv.includes("--browser")) {
+    const { checkBrowserAuth } = await import("./browser-auth.mjs");
+    await checkBrowserAuth({ origin, password: env.DASHBOARD_PASSWORD });
+  }
   assert.equal((await request("/")).status, 307);
   for (const path of ["/api/v1/stats", "/api/v1/messages", "/api/cron/sync", "/api/auth/google"]) {
     assert.equal((await request(path)).status, 401, path);

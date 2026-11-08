@@ -10,6 +10,7 @@
     "setup:check": "node scripts/check-env.mjs",
     "test": "tsx --test src/lib/*.test.ts scripts/*.test.ts",
     "test:smoke": "node scripts/smoke.mjs",
+    "test:browser": "node scripts/smoke.mjs --browser",
     "tracking:rebuild": "tsx scripts/rebuild-tracking.ts",
     "dev": "next dev",
     "build": "next build",
